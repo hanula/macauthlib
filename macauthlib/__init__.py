@@ -36,7 +36,7 @@ import os
 import time
 import hmac
 from hashlib import sha1
-from base64 import b64encode
+import binascii
 
 from macauthlib import utils
 from macauthlib.noncecache import NonceCache
@@ -64,9 +64,9 @@ def sign_request(request, id, key, hashmod=None, params=None):
     if "ts" not in params:
         params["ts"] = str(int(time.time()))
     if "nonce" not in params:
-        params["nonce"] = os.urandom(5).encode("hex")
+        params["nonce"] = str(binascii.hexlify(os.urandom(5)))
     # Calculate the signature and add it to the parameters.
-    params["mac"] = get_signature(request, key, hashmod, params)
+    params["mac"] = str(get_signature(request, key, hashmod, params))
     # Serialize the parameters back into the authz header.
     # WebOb has logic to do this that's not perfect, but good enough for us.
     request.authorization = ("MAC", params)
@@ -104,8 +104,12 @@ def get_signature(request, key, hashmod=None, params=None):
         params = utils.parse_authz_header(request, {})
     if hashmod is None:
         hashmod = sha1
+
     sigstr = utils.get_normalized_request_string(request, params)
-    return b64encode(hmac.new(key, sigstr, hashmod).digest())
+    signature = binascii.b2a_base64(hmac.new(key.encode('utf8'),
+                                             sigstr.encode('utf8'),
+                                             hashmod).digest())
+    return signature[:-1].decode('utf8')
 
 
 @utils.normalize_request_object

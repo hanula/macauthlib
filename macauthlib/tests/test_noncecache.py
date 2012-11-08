@@ -83,8 +83,8 @@ class TestNonceCache(unittest.TestCase):
         cache.set("hello", "world")
         try:
             cache.set("hello", "spamityspam")
-        except KeyExistsError, e:
-            self.assertEquals(e.key, "hello")
-            self.assertEquals(e.value, "world")
+        except KeyExistsError as error:
+            self.assertEquals(error.key, "hello")
+            self.assertEquals(error.value, "world")
         else:
             assert False, "KeyExistsError was not raised"  # pragma: nocover
