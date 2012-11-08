@@ -106,8 +106,8 @@ def get_signature(request, key, hashmod=None, params=None):
         hashmod = sha1
 
     sigstr = utils.get_normalized_request_string(request, params)
-    signature = binascii.b2a_base64(hmac.new(key.encode('utf8'),
-                                             sigstr.encode('utf8'),
+    signature = binascii.b2a_base64(hmac.new(key.encode('ascii'),
+                                             sigstr.encode('ascii'),
                                              hashmod).digest())
     return signature[:-1].decode('utf8')
 
