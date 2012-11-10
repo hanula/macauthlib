@@ -64,7 +64,7 @@ def sign_request(request, id, key, hashmod=None, params=None):
     if "ts" not in params:
         params["ts"] = str(int(time.time()))
     if "nonce" not in params:
-        params["nonce"] = str(binascii.hexlify(os.urandom(5)))
+        params["nonce"] = str(binascii.hexlify(os.urandom(5)).decode('ascii'))
     # Calculate the signature and add it to the parameters.
     params["mac"] = str(get_signature(request, key, hashmod, params))
     # Serialize the parameters back into the authz header.
